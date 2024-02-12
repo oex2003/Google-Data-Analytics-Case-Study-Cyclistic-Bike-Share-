@@ -1,0 +1,136 @@
+use CYCLYSTIC
+
+-- inserting whole data into one table --
+
+ 
+
+insert into 202301-divvy-tripdata.csv
+select * from 202302-divvy-tripdata.csv 
+
+insert into 202301-divvy-tripdata.csv
+select * from 202303-divvy-tripdata.csv 
+
+insert into 202301-divvy-tripdata.csv
+select * from 202304-divvy-tripdata.csv
+
+insert into 202301-divvy-tripdata.csv
+select * from 202305-divvy-tripdata.csv 
+
+insert into 202301-divvy-tripdata.csv
+select * from 202306-divvy-tripdata.csv 
+
+insert into 202301-divvy-tripdata.csv
+select * from 202307-divvy-tripdata.csv 
+
+insert into 202301-divvy-tripdata.csv
+select * from 202308-divvy-tripdata.csv 
+
+insert into 202301-divvy-tripdata.csv
+select * from 202309-divvy-tripdata.csv 
+
+insert into 202301-divvy-tripdata.csv
+select * from 202310-divvy-tripdata.csv 
+
+insert into 202301-divvy-tripdata.csv
+select * from 202311-divvy-tripdata.csv 
+
+insert into 202301-divvy-tripdata.csv
+select * from 202312-divvy-tripdata.csv 
+
+
+-- renaming the table to be an easy name --
+
+sp_rename '202301-divvy-tripdata.csv' ,'tripdata'
+
+--	exploring data  -- 
+
+select * from tripdata
+
+--removing duplicates --
+
+select 
+  distinct(ride_id),
+  rideable_type,
+  started_at, 
+  ended_at,
+  start_station_name,
+  end_station_name
+  member_casual
+
+ from 
+  tripdata
+
+-- updating the missing values -- 
+select 
+	start_station_name ,
+	start_station_id 
+
+from tripdata
+
+where start_station_name is not null and start_station_id is  null 
+
+
+update tripdata 
+set start_station_id='23001'
+where start_station_name ='Elizabeth St & Randolph St'
+
+update tripdata 
+set start_station_id='653B'
+where start_station_name ='Stony Island Ave & 63rd St'
+
+update tripdata 
+set end_station_id='23001'
+where end_station_name ='Elizabeth St & Randolph St'
+
+update tripdata 
+set end_station_id='653B'
+where end_station_name ='Stony Island Ave & 63rd St'
+
+
+-------------------------------------------------------
+--ignoring the missing all values--
+
+select *
+
+from tripdata
+
+where
+datediff(minute,started_at,ended_at) >0 
+ and start_station_name is not null 
+ and end_station_name is not null 
+ and start_lat is not null 
+ and end_lat is not null
+ and start_lng is not null 
+ and end_lng is not null
+
+ --------------------------------------------------------
+ ---- let's start adding columns ----
+
+ -- adding ride_length--
+
+ alter table tripdata
+ add ride_length float
+
+ update tripdata
+ SET ride_length =datediff(minute,started_at,ended_at)
+
+-- adding start_date by month column -- 
+ 
+ alter table tripdata 
+ add month_name varchar(55)
+
+ update tripdata
+
+set month_name =DATENAME(month,started_at)
+
+-- adding weekday column --
+alter table tripdata 
+add weekday_name varchar(55)
+
+update tripdata 
+set weekday_name = DATENAME(WEEKDAY,started_at)
+
+--------------------------------------------------
+-- the vizualizations and analysis is on the site : https://medium.com/@oex2003/google-data-analytics-capstone-project-cyclistic-bike-share-1b118c9217cc?source=user_profile---------0----------------------------
+
+
