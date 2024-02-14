@@ -130,6 +130,41 @@ add weekday_name varchar(55)
 update tripdata 
 set weekday_name = DATENAME(WEEKDAY,started_at)
 
+-- so the last design of our query that will be used is:--
+
+select 
+ distinct(ride_id),
+ rideable_type,
+ start_station_name,
+ end_station_name,
+ member_casual,
+ cast(started_at as date)as start_date,
+ cast(ended_at as date)as end_date,
+ datepart(hour,started_at)as start_hour,
+ datepart(hour,ended_at)as end_hour,
+ DATENAME(WEEKDAY,started_at)as week_day,
+ DATENAME(month,started_at)as month_name,
+ trip_duration,
+ case 
+  when ( started_at like  '2023-01%'or started_at like '2023-02-%'or started_at like '2023-03-%')then 'q1'
+  when ( started_at like  '2023-04%'or started_at like '2023-05-%'or started_at like '2023-06-%')then 'q2'
+  when ( started_at like  '2023-07%'or started_at like '2023-08-%'or started_at like '2023-09-%') then 'q3'
+  when ( started_at like  '2023-10%'or started_at like '2023-11-%'or started_at like '2023-12-%') then 'q4'
+
+  end as quarter_type
+
+from CYCLYSTIC..tripdata
+
+where 
+ datediff(minute,started_at,ended_at) >0 
+ and start_station_name is not null 
+ and end_station_name is not null 
+ and start_lat is not null 
+ and end_lat is not null
+ and start_lng is not null 
+ and end_lng is not null
+
+
 --------------------------------------------------
 -- the vizualizations and analysis is on the site : https://medium.com/@oex2003/google-data-analytics-capstone-project-cyclistic-bike-share-1b118c9217cc?source=user_profile---------0----------------------------
 
